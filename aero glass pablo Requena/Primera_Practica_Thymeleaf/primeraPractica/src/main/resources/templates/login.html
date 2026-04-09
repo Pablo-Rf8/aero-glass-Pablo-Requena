@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesión - IT Desktop</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; }
+        body {
+            height: 100vh; display: flex; justify-content: center; align-items: center;
+            background-color: #00426b; background-image: url('/fondo-aero.jpg');
+            background-size: cover; background-position: center; background-attachment: fixed; overflow: hidden;
+        }
+
+        .aero-window {
+            width: 420px; background: linear-gradient(180deg, rgba(173, 206, 235, 0.7) 0%, rgba(142, 188, 226, 0.6) 45%, rgba(88, 151, 203, 0.6) 50%, rgba(145, 196, 232, 0.7) 100%);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 8px 8px 5px 5px;
+            border: 1px solid #2a4e6e; box-shadow: inset 0 1px 1px rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.4), 0 20px 50px rgba(0,0,0,0.5);
+            padding: 0 5px 5px 5px; position: relative; z-index: 10;
+        }
+
+        /* BARRA ARRASTRABLE */
+        .aero-title-bar {
+            height: 32px; display: flex; justify-content: space-between; align-items: center; padding: 0 5px;
+            cursor: grab; user-select: none;
+        }
+        .aero-title-bar:active { cursor: grabbing; }
+
+        .aero-title-text { color: #000; font-size: 12px; font-weight: 500; text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 1px 2px rgba(0,0,0,0.3); pointer-events: none; }
+        .aero-controls { display: flex; gap: 1px; align-self: flex-start; cursor: default; }
+        .control-btn { width: 28px; height: 18px; border: 1px solid #3d5166; border-top: none; background: linear-gradient(180deg, #e4eff9 0%, #c1dcf1 45%, #9fd0ee 50%, #b2dcf3 100%); box-shadow: inset 0 1px 1px white; border-bottom-left-radius: 3px; border-bottom-right-radius: 3px; display: flex; justify-content: center; align-items: center; font-size: 10px; color: #333; }
+        .control-btn.close { width: 45px; background: linear-gradient(180deg, #f0b0b0 0%, #e07070 45%, #c02020 50%, #d05050 100%); border-color: #601010; color: white; }
+        .aero-menubar { background: linear-gradient(180deg, #fefefe 0%, #f0f4f8 100%); border: 1px solid #9dbcd4; border-bottom: none; padding: 4px 10px; display: flex; gap: 12px; font-size: 12px; color: #1e395b; }
+
+        .aero-inner-content { background: linear-gradient(180deg, #e2eaf0 0%, #cedce6 100%); border: 1px solid #9dbcd4; padding: 30px 40px; text-align: center; }
+        .avatar-box { width: 75px; height: 75px; margin: 0 auto 15px; background: linear-gradient(180deg, #00c6ff, #0072ff); border: 2px solid #00ffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2), 0 0 15px rgba(0, 255, 255, 0.4); display: flex; justify-content: center; align-items: center; }
+        .avatar-box::after { content: "👤"; font-size: 45px; color: #4a00e0; filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.3)); }
+        h2 { color: #003366; font-size: 20px; font-weight: 500; margin-bottom: 15px; }
+
+        .input-group { margin-bottom: 15px; }
+        .input-group input { width: 100%; padding: 10px 12px; border: 1px solid #a0b5c9; border-radius: 4px; font-size: 14px; outline: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+        .input-group input:focus { border-color: #00c6ff; box-shadow: 0 0 8px #00c6ff, inset 0 2px 4px rgba(0,0,0,0.05); }
+
+        .btn-blue { display: block; width: 100%; padding: 12px; margin-top: 10px; border-radius: 4px; border: 1px solid #004d7a; color: white; font-size: 14px; font-weight: bold; cursor: pointer; text-decoration: none; background: linear-gradient(180deg, #3bb4e5 0%, #157fbc 49%, #005a96 50%, #004577 100%); box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), 0 4px 6px rgba(0,0,0,0.3); text-shadow: 0 -1px 1px rgba(0,0,0,0.6); }
+        .btn-green { display: block; width: 100%; padding: 12px; margin-top: 10px; border-radius: 4px; border: 1px solid #006600; color: white; font-size: 14px; font-weight: bold; cursor: pointer; text-decoration: none; background: linear-gradient(180deg, #2ae038 0%, #0db81b 49%, #00960a 50%, #007a08 100%); box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), 0 4px 6px rgba(0,0,0,0.3); text-shadow: 0 -1px 1px rgba(0,0,0,0.6); }
+        .btn-blue:active, .btn-green:active { transform: translateY(1px); box-shadow: none; }
+
+        .alerta { color: #c00; font-size: 12px; margin-bottom: 15px; }
+        .exito { color: #008000; font-size: 12px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+<div class="aero-window" id="ventana-arrastrable">
+    <div class="aero-title-bar" id="barra-arrastre">
+        <div class="aero-title-text">Inicio de Sesión - IT Desktop</div>
+        <div class="aero-controls"><div class="control-btn">_</div><div class="control-btn">□</div><div class="control-btn close">X</div></div>
+    </div>
+    <div class="aero-menubar"><span>Archivo</span> <span>Opciones</span> <span>Ayuda</span></div>
+
+    <div class="aero-inner-content">
+        <div class="avatar-box"></div>
+        <h2>Bienvenido</h2>
+
+        <div th:if="${param.error}" class="alerta">El usuario o la contraseña son incorrectos.</div>
+        <div th:if="${param.logout}" class="exito">Has cerrado la sesión.</div>
+        <div th:if="${param.exito}" class="exito">Cuenta creada exitosamente.</div>
+
+        <form th:action="@{/login}" method="post">
+            <div class="input-group"><input type="text" name="username" placeholder="Usuario" required autofocus></div>
+            <div class="input-group"><input type="password" name="password" placeholder="Contraseña" required></div>
+            <button type="submit" class="btn-blue">Ingresar al Sistema</button>
+        </form>
+        <a th:href="@{/register}" class="btn-green">Crear una cuenta nueva</a>
+    </div>
+</div>
+
+<script>
+    const contenedor = document.getElementById('ventana-arrastrable'); const barra = document.getElementById('barra-arrastre');
+    let arrastrando = false, offsetX = 0, offsetY = 0;
+    barra.addEventListener('mousedown', (e) => {
+        if(e.target.closest('.aero-controls')) return;
+        arrastrando = true; const rect = contenedor.getBoundingClientRect();
+        offsetX = e.clientX - rect.left; offsetY = e.clientY - rect.top;
+        contenedor.style.position = 'absolute'; contenedor.style.left = rect.left + 'px'; contenedor.style.top = rect.top + 'px'; contenedor.style.margin = '0';
+    });
+    document.addEventListener('mousemove', (e) => { if (!arrastrando) return; e.preventDefault(); contenedor.style.left = (e.clientX - offsetX) + 'px'; contenedor.style.top = (e.clientY - offsetY) + 'px'; });
+    document.addEventListener('mouseup', () => { arrastrando = false; });
+</script>
+</body>
+</html>

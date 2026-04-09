@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Propiedades</title>
+</head>
+<body>
+<div class="aero-window window-datos">
+    <div class="aero-title-bar">
+        <div class="aero-title-text">Propiedades del Sistema</div>
+        <div class="aero-controls"><div class="control-btn">_</div><div class="control-btn">□</div><div class="control-btn close">X</div></div>
+    </div>
+    <div class="aero-menubar"><span>General</span> <span>Hardware</span></div>
+    <div class="aero-inner-content">
+        <div class="info-row"><span class="label">Usuario:</span> <span class="value" th:text="${Nombre}"></span></div>
+        <div class="info-row"><span class="label">Apellido:</span> <span class="value" th:text="${Apellido}"></span></div>
+        <div class="info-row"><span class="label">Edad:</span> <span class="value" th:text="${Edad} + ' años'"></span></div>
+        <a th:href="@{/home}" class="btn-blue">ACEPTAR</a>
+    </div>
+</div>
+</body>
+</html>

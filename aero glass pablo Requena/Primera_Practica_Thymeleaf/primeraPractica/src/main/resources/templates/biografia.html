@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biografía - Bloc de notas Aero</title>
+    <style>
+        /* Estilos base de la interfaz Aero Glass y Bloc de Notas */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; }
+
+        body {
+            height: 100vh; display: flex; justify-content: center; align-items: center;
+            background-image: url('/fondo-aero.jpg'); background-size: cover; background-position: center;
+            overflow: hidden; padding: 20px;
+        }
+
+        /* IDENTIDAD ÚNICA: window-bio para aplicar los estilos específicos de la Biografía */
+        .aero-window.window-bio {
+            max-width: 600px; width: 100%;
+            background: linear-gradient(180deg, rgba(173, 206, 235, 0.7) 0%, rgba(142, 188, 226, 0.6) 45%, rgba(88, 151, 203, 0.6) 50%, rgba(145, 196, 232, 0.7) 100%);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border-radius: 8px 8px 5px 5px; border: 1px solid #2a4e6e;
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.9), 0 20px 50px rgba(0,0,0,0.5);
+            padding: 0 5px 5px 5px; position: relative; z-index: 10;
+        }
+
+        .aero-title-bar { height: 32px; display: flex; justify-content: space-between; align-items: center; padding: 0 5px; cursor: grab; user-select: none; }
+        .aero-title-text { color: #000; font-size: 11px; font-weight: 500; text-shadow: 0 0 5px #fff; pointer-events: none;}
+
+        .aero-controls { display: flex; gap: 1px; cursor: default;}
+        .control-btn { width: 28px; height: 18px; border: 1px solid #3d5166; background: linear-gradient(180deg, #e4eff9 0%, #b2dcf3 100%); display: flex; justify-content: center; align-items: center; font-size: 10px; }
+        .control-btn.close { width: 45px; background: linear-gradient(180deg, #f0b0b0 0%, #e07070 45%, #c02020 50%, #d05050 100%); border-color: #601010; color: white; cursor: pointer;}
+
+        .aero-menubar { background: linear-gradient(180deg, #fefefe 0%, #f0f4f8 100%); border: 1px solid #9dbcd4; border-bottom: none; padding: 4px 10px; display: flex; gap: 12px; font-size: 12px; color: #1e395b; }
+
+        /* CONTENIDO INTERIOR (Estilo Bloc de notas con imagen flotante) */
+        .aero-inner-content {
+            background: #fff; border: 1px solid #9dbcd4; padding: 25px;
+            min-height: 250px; font-family: Consolas, 'Courier New', monospace;
+            font-size: 14px; line-height: 1.6; color: #000;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            text-align: justify;
+        }
+
+        /* DISEÑO DE LA IMAGEN DE PERFIL (SOLUCIÓN DEFINITIVA AL TAMAÑO GIGANTE) */
+        .bio-image-container {
+            float: right;
+            margin-left: 20px;
+            margin-bottom: 10px;
+            padding: 5px;
+            background: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+
+            /* FORZAMOS EL TAMAÑO DE LA CAJA CONTENEDORA */
+            width: 150px; /* Ancho total (140px de imagen + 10px de padding/border) */
+            height: 180px; /* Alto total (170px de imagen + 10px de padding/border) */
+            overflow: hidden; /* Corta cualquier cosa que se salga de la caja */
+        }
+
+        .bio-image {
+            /* ESTO HACE QUE LA IMAGEN GIGANTE SE AJUSTE ESTRICTAMENTE */
+            width: 100%;  /* Se estira o encoge para llenar el ancho del contenedor */
+            height: 100%; /* Se estira o encoge para llenar el alto del contenedor */
+
+            /* IMPORTANTE: Esta propiedad corta y centra la imagen gigante dentro del
+               espacio de 140x170, como si fuera un avatar, para que no se deforme
+               y solo se vea la parte central de la foto. */
+            object-fit: cover;
+
+            /* Centra la parte de la foto gigante que se va a mostrar */
+            object-position: center;
+
+            display: block;
+        }
+
+        .btn-blue {
+            display: block; width: 100%; padding: 10px; margin-top: 20px;
+            text-align: center; border-radius: 4px; border: 1px solid #004d7a;
+            color: white; text-decoration: none; font-weight: bold; font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(180deg, #3bb4e5 0%, #004577 100%);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.6);
+        }
+    </style>
+</head>
+<body>
+<div class="aero-window window-bio" id="ventana-arrastrable">
+    <div class="aero-title-bar" id="barra-arrastre">
+        <div class="aero-title-text">biografia.txt - Bloc de notas</div>
+        <div class="aero-controls">
+            <div class="control-btn">_</div><div class="control-btn">□</div><div class="control-btn close">X</div>
+        </div>
+    </div>
+    <div class="aero-menubar"><span>Archivo</span> <span>Edición</span> <span>Formato</span></div>
+    <div class="aero-inner-content">
+        <div class="bio-image-container">
+            <img src="/perfil-pablo.jpg" alt="Perfil de Pablo" class="bio-image">
+        </div>
+
+        <p>Hola, soy <strong>Pablo David Requena Mollinedo</strong>. Tengo 19 años y soy estudiante de Informática (IT). Me apasiona la tecnología y cómo los sistemas resuelven problemas complejos.</p>
+        <br>
+        <p>Me gusta jugar Fortnite y Battlefield. En la música, prefiero el IDM, Synthwave y artistas como Aphex Twin. Soy fanático del cine de ciencia ficción, especialmente de Terminator 2.</p>
+        <p>Actualmente me enfoco en el desarrollo backend con Spring Boot y el diseño de interfaces modernas con estética Aero.</p>
+
+        <a th:href="@{/home}" class="btn-blue">CERRAR DOCUMENTO</a>
+    </div>
+</div>
+
+<script>
+    const contenedor = document.getElementById('ventana-arrastrable'); const barra = document.getElementById('barra-arrastre');
+    let arrastrando = false, offsetX = 0, offsetY = 0;
+    barra.addEventListener('mousedown', (e) => {
+        if(e.target.closest('.aero-controls')) return;
+        arrastrando = true; const rect = contenedor.getBoundingClientRect(); offsetX = e.clientX - rect.left; offsetY = e.clientY - rect.top;
+        contenedor.style.position = 'absolute'; contenedor.style.left = rect.left + 'px'; contenedor.style.top = rect.top + 'px'; contenedor.style.margin = '0';
+    });
+    document.addEventListener('mousemove', (e) => { if (!arrastrando) return; e.preventDefault(); contenedor.style.left = (e.clientX - offsetX) + 'px'; contenedor.style.top = (e.clientY - offsetY) + 'px'; });
+    document.addEventListener('mouseup', () => { arrastrando = false; });
+</script>
+</body>
+</html>

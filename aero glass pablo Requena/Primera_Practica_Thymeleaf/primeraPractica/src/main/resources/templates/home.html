@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>frutiger-aero.es - Escritorio</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; }
+        body { height: 100vh; display: flex; justify-content: center; align-items: center; background-image: url('/fondo-aero.jpg'); background-size: cover; background-position: center; overflow: hidden; }
+
+        /* --- ESTILO BASE DE CRISTAL PARA TODAS LAS VENTANAS --- */
+        .aero-window { background: linear-gradient(180deg, rgba(173, 206, 235, 0.7) 0%, rgba(142, 188, 226, 0.6) 45%, rgba(88, 151, 203, 0.6) 50%, rgba(145, 196, 232, 0.7) 100%); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 8px 8px 5px 5px; border: 1px solid #2a4e6e; box-shadow: inset 0 1px 1px rgba(255,255,255,0.9), 0 20px 50px rgba(0,0,0,0.5); padding: 0 5px 5px 5px; position: absolute; }
+        .aero-title-bar { height: 32px; display: flex; justify-content: space-between; align-items: center; padding: 0 5px; cursor: grab; user-select: none; }
+        .aero-title-bar:active { cursor: grabbing; }
+        .aero-title-text { color: #000; font-size: 12px; font-weight: 500; text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff; pointer-events: none;}
+        .aero-controls { display: flex; gap: 1px; cursor: default;}
+        .control-btn { width: 28px; height: 18px; border: 1px solid #3d5166; border-top: none; background: linear-gradient(180deg, #e4eff9 0%, #c1dcf1 45%, #9fd0ee 50%, #b2dcf3 100%); border-bottom-left-radius: 3px; border-bottom-right-radius: 3px; display: flex; justify-content: center; align-items: center; font-size: 10px; color: #333; }
+        .control-btn.close { width: 45px; background: linear-gradient(180deg, #f0b0b0 0%, #e07070 45%, #c02020 50%, #d05050 100%); border-color: #601010; color: white; cursor: pointer; }
+        .control-btn.close:hover { filter: brightness(1.2); }
+        .aero-menubar { background: linear-gradient(180deg, #fefefe 0%, #f0f4f8 100%); border: 1px solid #9dbcd4; border-bottom: none; padding: 4px 10px; display: flex; gap: 12px; font-size: 12px; color: #1e395b; }
+        .btn-blue { display: block; width: 100%; padding: 12px; margin-top: 10px; border-radius: 4px; border: 1px solid #004d7a; color: white; font-size: 14px; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; background: linear-gradient(180deg, #3bb4e5 0%, #157fbc 49%, #005a96 50%, #004577 100%); box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), 0 4px 6px rgba(0,0,0,0.3); text-shadow: 0 -1px 1px rgba(0,0,0,0.6); }
+        .btn-blue:active { transform: translateY(1px); box-shadow: none; }
+
+        /* CARACTERÍSTICAS ÚNICAS DE CADA VENTANA */
+        .window-home { width: 500px; z-index: 10; margin-bottom: 40px; /* Margen para no chocar con la barra */ }
+        .window-home .aero-inner-content { background: linear-gradient(180deg, #e2eaf0 0%, #cedce6 100%); border: 1px solid #9dbcd4; padding: 30px; text-align: center; }
+        .window-home h1 { color: #003366; font-size: 22px; margin-bottom: 20px; font-weight: 500; }
+
+        .window-datos { width: 420px; }
+        .window-datos .aero-inner-content { background: #fff; border: 1px solid #9dbcd4; padding: 25px; }
+        .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+        .label { color: #666; font-size: 13px; font-weight: bold; }
+        .value { color: #000; font-size: 14px; font-weight: 500;}
+
+        .window-usuario { width: 420px; }
+        .window-usuario .aero-inner-content { background: linear-gradient(180deg, #e2eaf0 0%, #cedce6 100%); border: 1px solid #9dbcd4; padding: 30px; text-align: center; }
+        .avatar-box { width: 75px; height: 75px; margin: 0 auto 15px; background: linear-gradient(180deg, #00c6ff, #0072ff); border: 2px solid #00ffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2), 0 0 15px rgba(0, 255, 255, 0.4); display: flex; justify-content: center; align-items: center; }
+        .avatar-box::after { content: "👤"; font-size: 45px; color: #4a00e0; filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.3)); }
+        .window-usuario h2 { color: #003366; font-size: 18px; margin-bottom: 15px; font-weight: 500;}
+        .skill-list { list-style: none; padding: 15px 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+        .skill-item { background: #fff; color: #1e395b; border: 1px solid #9dbcd4; padding: 4px 12px; border-radius: 3px; font-size: 12px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); }
+
+        .window-bio { width: 520px; }
+        .window-bio .aero-inner-content { background: #fff; border: 1px solid #9dbcd4; padding: 30px; line-height: 1.6; color: #000; font-size: 14px; text-align: justify; font-family: Consolas, 'Courier New', monospace; }
+
+        /* ================================================================= */
+        /* LA BARRA DE TAREAS (TASKBAR) ESTILO AERO                          */
+        /* ================================================================= */
+        .aero-taskbar {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 40px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(142, 188, 226, 0.4) 49%, rgba(88, 151, 203, 0.5) 50%, rgba(145, 196, 232, 0.6) 100%);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255,255,255,0.7); box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 -2px 15px rgba(0,0,0,0.3);
+            display: flex; align-items: center; justify-content: space-between;
+            z-index: 9999; padding: 0 10px;
+        }
+
+        /* Botón de Inicio (Orb) que sobresale un poco */
+        .start-orb {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: linear-gradient(180deg, #147dd9 0%, #06408a 100%);
+            box-shadow: inset 0 0 5px rgba(255,255,255,0.8), 0 0 8px rgba(0,0,0,0.5);
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; position: relative; margin-top: -6px; margin-left: 5px;
+            border: 2px solid rgba(255,255,255,0.4); transition: 0.2s;
+        }
+        .orb-inner {
+            width: 24px; height: 24px; border-radius: 50%;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            box-shadow: inset 0 0 5px white; display: flex; justify-content: center; align-items: center;
+        }
+        .orb-inner::after { content: "❖"; color: white; font-size: 16px; text-shadow: 0 0 5px #fff; }
+        .start-orb:hover { filter: brightness(1.2); box-shadow: inset 0 0 10px rgba(255,255,255,1), 0 0 15px #4facfe; }
+
+        /* Simulación de Apps Abiertas */
+        .taskbar-apps { flex-grow: 1; display: flex; align-items: center; padding-left: 20px; gap: 5px; }
+        .app-icon { width: 50px; height: 36px; border-radius: 3px; border: 1px solid transparent; background: rgba(255,255,255,0.05); }
+        .app-icon.active {
+            background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.1) 49%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.5) 100%);
+            border: 1px solid rgba(255,255,255,0.8); box-shadow: inset 0 0 8px rgba(255,255,255,0.7), 0 0 5px rgba(255,255,255,0.4);
+        }
+
+        /* Bandeja del Sistema (Reloj) */
+        .system-tray { display: flex; align-items: center; gap: 15px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.9); font-size: 11px; padding-right: 10px; cursor: default; }
+        .tray-icon { font-size: 14px; }
+        .tray-time { text-align: center; line-height: 1.2; font-weight: 500;}
+    </style>
+</head>
+<body>
+
+<div class="aero-window window-home" id="ventana-principal" style="left: 50%; top: 45%; transform: translate(-50%, -50%);">
+    <div class="aero-title-bar">
+        <div class="aero-title-text">frutiger-aero.es</div>
+        <div class="aero-controls"><div class="control-btn">_</div><div class="control-btn">□</div><div class="control-btn close" style="cursor:default">X</div></div>
+    </div>
+    <div class="aero-menubar"><span>Archivo</span> <span>Subgéneros</span> <span>Ayuda</span></div>
+    <div class="aero-inner-content">
+        <h1>Bienvenido, <span th:text="${username}"></span></h1>
+
+        <a th:href="@{/datos}" class="btn-blue btn-abrir-ventana">PROPIEDADES DEL SISTEMA</a>
+        <a th:href="@{/usuario}" class="btn-blue btn-abrir-ventana">PANEL DE USUARIO</a>
+        <a th:href="@{/biografia}" class="btn-blue btn-abrir-ventana">BIOGRAFÍA.TXT</a>
+
+        <form th:action="@{/logout}" method="post" style="margin-top: 15px;">
+            <button type="submit" style="background:none; border:none; color:#0066cc; cursor:pointer; text-decoration:underline; font-size:12px;">Cerrar Sesión</button>
+        </form>
+    </div>
+</div>
+
+<div class="aero-taskbar">
+    <div class="start-orb">
+        <div class="orb-inner"></div>
+    </div>
+    <div class="taskbar-apps">
+        <div class="app-icon active"></div>
+        <div class="app-icon"></div>
+        <div class="app-icon"></div>
+    </div>
+    <div class="system-tray">
+        <span class="tray-icon">◭</span>
+        <span class="tray-icon">🔊</span>
+        <span class="tray-time" id="reloj-aero">12:00 p. m.<br>01/01/2007</span>
+    </div>
+</div>
+
+<script>
+    // 1. EL RELOJ EN TIEMPO REAL PARA LA BARRA DE TAREAS
+    function actualizarReloj() {
+        const ahora = new Date();
+        const opcionesHora = { hour: 'numeric', minute: '2-digit', hour12: true };
+        const opcionesFecha = { day: '2-digit', month: '2-digit', year: 'numeric' };
+
+        const horaString = ahora.toLocaleTimeString('es-ES', opcionesHora);
+        const fechaString = ahora.toLocaleDateString('es-ES', opcionesFecha);
+
+        document.getElementById('reloj-aero').innerHTML = `${horaString}<br>${fechaString}`;
+    }
+    setInterval(actualizarReloj, 1000);
+    actualizarReloj(); // Llamada inicial
+
+    // 2. SISTEMA DE VENTANAS (Arrastrar y Sobreponer)
+    let zIndexGlobal = 10;
+
+    function hacerVentanaInteligente(ventana) {
+        const barra = ventana.querySelector('.aero-title-bar');
+
+        ventana.addEventListener('mousedown', () => {
+            zIndexGlobal++;
+            ventana.style.zIndex = zIndexGlobal;
+        });
+
+        if (!barra) return;
+
+        let arrastrando = false, offsetX = 0, offsetY = 0;
+
+        barra.addEventListener('mousedown', (e) => {
+            if(e.target.closest('.aero-controls')) return;
+            arrastrando = true;
+            ventana.style.transform = 'none';
+            const rect = ventana.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!arrastrando) return;
+            e.preventDefault();
+            ventana.style.left = (e.clientX - offsetX) + 'px';
+            ventana.style.top = (e.clientY - offsetY) + 'px';
+        });
+
+        document.addEventListener('mouseup', () => { arrastrando = false; });
+    }
+
+    hacerVentanaInteligente(document.getElementById('ventana-principal'));
+
+    // 3. CARGAR SUB-VENTANAS
+    document.querySelectorAll('.btn-abrir-ventana').forEach(boton => {
+        boton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const url = boton.getAttribute('href');
+
+            try {
+                const respuesta = await fetch(url);
+                const html = await respuesta.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                const nuevaVentana = doc.querySelector('.aero-window');
+
+                if (nuevaVentana) {
+                    zIndexGlobal++;
+                    const desfaseX = 100 + (zIndexGlobal * 15);
+                    const desfaseY = 100 + (zIndexGlobal * 10);
+
+                    nuevaVentana.style.position = 'absolute';
+                    nuevaVentana.style.left = desfaseX + 'px';
+                    nuevaVentana.style.top = desfaseY + 'px';
+                    nuevaVentana.style.transform = 'none';
+                    nuevaVentana.style.zIndex = zIndexGlobal;
+
+                    const btnCerrar = nuevaVentana.querySelector('.control-btn.close');
+                    if(btnCerrar) { btnCerrar.addEventListener('click', () => nuevaVentana.remove()); }
+
+                    const botonesInternos = nuevaVentana.querySelectorAll('a.btn-blue');
+                    botonesInternos.forEach(b => {
+                        if(b.getAttribute('href').includes('home')) {
+                            b.addEventListener('click', (evt) => {
+                                evt.preventDefault();
+                                nuevaVentana.remove();
+                            });
+                        }
+                    });
+
+                    document.body.appendChild(nuevaVentana);
+                    hacerVentanaInteligente(nuevaVentana);
+                }
+            } catch (error) {
+                window.location.href = url;
+            }
+        });
+    });
+</script>
+</body>
+</html>

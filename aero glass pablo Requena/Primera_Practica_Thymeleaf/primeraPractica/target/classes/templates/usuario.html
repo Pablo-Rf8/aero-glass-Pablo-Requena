@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Perfil</title>
+</head>
+<body>
+<div class="aero-window window-usuario">
+    <div class="aero-title-bar">
+        <div class="aero-title-text">Panel de Control de Usuario</div>
+        <div class="aero-controls"><div class="control-btn">_</div><div class="control-btn">□</div><div class="control-btn close">X</div></div>
+    </div>
+    <div class="aero-menubar"><span>Cuentas</span> <span>Seguridad</span></div>
+    <div class="aero-inner-content">
+        <div class="avatar-box"></div>
+        <h2 th:text="${Nombre}"></h2>
+        <div style="margin: 10px 0;">
+            <span th:each="hab : ${Habilidades}" class="skill-tag" th:text="${hab}"></span>
+        </div>
+        <a th:href="@{/home}" class="btn-blue">VOLVER</a>
+    </div>
+</div>
+</body>
+</html>
